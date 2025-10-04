@@ -67,6 +67,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Provide a simple hello endpoint that can be used for HTTPS checks or general connectivity.
+# Keeping it here ensures it appears in the OpenAPI schema regardless of the runner used.
+@app.get("/api/hello", summary="Hello over HTTPS", tags=["system"])
+def hello_https():
+    """Simple hello endpoint; useful to verify HTTPS runner or connectivity."""
+    return {"message": "Hello from FastAPI over HTTPS"}
+
 # -----------------------------------------------------------------------------
 # In-memory placeholder data structures (no DB)
 # -----------------------------------------------------------------------------
@@ -222,6 +229,7 @@ def health_check():
     """Basic health endpoint to verify the service is running."""
     return {"message": "Healthy"}
 
+# Ensure no duplicate definition exists for /api/hello; defined once above near middleware.
 # PUBLIC_INTERFACE
 @app.post(
     "/generate",
