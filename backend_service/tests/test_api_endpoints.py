@@ -1,7 +1,4 @@
-import json
 import pytest
-
-from src.api.main import app
 
 def test_health_check(app_client):
     r = app_client.get("/")
