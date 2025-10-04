@@ -25,7 +25,12 @@ def _parse_cors(origins_raw: Optional[str]) -> List[str]:
     - JSON array string
     If not provided or parsing fails, default to common dev origins.
     """
-    default_dev = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    default_dev = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://localhost:3000",
+        "https://127.0.0.1:3000",
+    ]
     if not origins_raw:
         return default_dev
     try:
