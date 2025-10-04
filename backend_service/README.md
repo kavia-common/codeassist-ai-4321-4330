@@ -40,6 +40,38 @@ Notes:
 - Keep imports minimal in `main.py`. Do not introduce DB clients here.
 - For production, add proper CORS restrictions, auth, rate limiting, and observability.
 
-Development
-- Generate OpenAPI JSON: `python -m src.api.generate_openapi`
+## Environment Variables
+
+Set these in your environment (via .env managed by the orchestrator):
+
+- OPENAI_API_KEY: Required. Your OpenAI API key.
+- OPENAI_BASE_URL: Optional. Defaults to https://api.openai.com/v1. Useful for compatible gateways.
+- DEFAULT_OPENAI_MODEL: Optional. Defaults to gpt-4o-mini.
+- REQUEST_TIMEOUT: Optional. HTTP timeout in seconds (float). Defaults to 30.
+- BACKEND_CORS_ORIGINS: Optional. Comma-separated list or JSON array of allowed origins (e.g., "http://localhost:3000,http://127.0.0.1:3000"). If not set, defaults to ["http://localhost:3000", "http://127.0.0.1:3000"] in development.
+
+## CORS
+
+CORS is configured via FastAPI CORSMiddleware:
+- If BACKEND_CORS_ORIGINS is set, its values are used.
+- If not set, the service allows http://localhost:3000 and http://127.0.0.1:3000 for development convenience.
+- Credentials, all methods, and all headers are allowed.
+
+## Development
+
+- Generate OpenAPI JSON:
+  - Programmatic: from Python: 
+    - `from src.api.generate_openapi import generate; print(generate())`
+  - CLI: 
+    - `python -m src.api.generate_openapi`
 - Run with uvicorn: `uvicorn src.api.main:app --reload --port 3001`
+
+## OpenAI Usage Notes
+
+The service uses httpx to call the Chat Completions endpoint:
+- Authorization via `OPENAI_API_KEY` header (Bearer).
+- Base URL configurable via `OPENAI_BASE_URL`.
+- Default model via `DEFAULT_OPENAI_MODEL`; can be overridden per-request.
+
+Errors from upstream are mapped to appropriate HTTP errors (502/504) with a small error envelope.
+

@@ -19,18 +19,24 @@ def _env(name: str, default: Optional[str] = None) -> Optional[str]:
     return os.environ.get(name, default)
 
 def _parse_cors(origins_raw: Optional[str]) -> List[str]:
+    """
+    Parse CORS origins from env. Supports:
+    - Comma-separated list
+    - JSON array string
+    If not provided or parsing fails, default to common dev origins.
+    """
+    default_dev = ["http://localhost:3000", "http://127.0.0.1:3000"]
     if not origins_raw:
-        # Default allow localhost:3000 per requirements
-        return ["http://localhost:3000"]
+        return default_dev
     try:
         # Support comma-separated list or JSON array string
         if origins_raw.strip().startswith("["):
             parsed = json.loads(origins_raw)
-            return [str(o) for o in parsed]
+            return [str(o).strip() for o in parsed if str(o).strip()]
         return [o.strip() for o in origins_raw.split(",") if o.strip()]
     except Exception:
-        # Fallback to permissive single origin if parsing fails
-        return ["http://localhost:3000"]
+        # Fallback to dev defaults if parsing fails
+        return default_dev
 
 DEFAULT_MODEL = _env("DEFAULT_OPENAI_MODEL", "gpt-4o-mini")
 OPENAI_API_KEY = _env("OPENAI_API_KEY")
